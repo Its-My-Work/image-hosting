@@ -13,6 +13,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::post('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/home/{gallery_id}','App\Http\Controllers\HomeController@delete')->name('delete');
+
+Route::get('/register/delete/{user_id}','App\Http\Controllers\Auth\RegisterController@delete_user')->name('delete_user');
+
+Route::get('/register/edit/{user_id}','App\Http\Controllers\Auth\RegisterController@edit_user')->name('edit_user');
+Route::post('/register/edit/{user_id}','App\Http\Controllers\Auth\RegisterController@edit_user')->name('edit_user');
+
+Route::get('/logout', 'App\Http\Controllers\Auth\LoginController@logout');
+
+
