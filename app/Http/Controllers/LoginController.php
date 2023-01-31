@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
-
+use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
@@ -28,7 +28,6 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
      * Create a new controller instance.
@@ -44,5 +43,24 @@ class LoginController extends Controller
         $this->guard()->logout();
         $request->session()->invalidate();
         return $this->loggedOut($request) ?: redirect('/');
+    }
+
+     public function authenticate(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+ 
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('home');
+        }
+        else return redirect('login')->withErrors( __('auth.failed'));
+    }
+
+     public function login()
+    {
+        return view('login');
     }
 }

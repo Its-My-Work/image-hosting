@@ -14,72 +14,58 @@ use App\Models\images;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
+
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function index(Request $request)
+
+    public function index($message = false)
     {
-        //стартовые переменные
-        $message =  __('You are logged in!');
-        $images = [];
-        $filename = false;
-        $errors = false;
+        if(Auth::user()->role == 'admin') $added_by = '*';
+        $galleris = images::show();
+        return view('home', ['status' => $message, 'galleries' => $galleris]);
+    }
 
-        $galleris = images::all();
-        
-
-        // если форма с файлами отправлена
+    //функция создания галереи и загрузки изображений
+    protected function create(Request $request)
+    {
         if ($request->isMethod('post') && $request->file('images')) {
             //проверяем допустимость файла и записываем ошибку если не допустим
             $request->validate([
                 'images.*' => 'image',
                 'images.*' => 'mimetypes:image/jpeg,image/png',
             ]); 
-            if($errors == true) $message = __('Only images!');
 
-            //проверяем кол-во файлов, если ок - загружаем
             if(count($request->file('images')) <= 5) {
+                $filename = false;
                 foreach($request->file('images') as $key => $image){                   
                     $upload = Storage::putFile("/public/", $image);  //загружаем файл
                     $filename .= basename($upload).'!';
                 }
-                
                 //запрос в БД insert
                 $id = DB::table('images')->insertGetId(['file' => $filename, 'upload_by' => Auth::user()->id, 'created_at' => new DateTime]);
                 //сообщение об успешной загрузке
-                $message = __('Image successful upload!').' '.__('Your Link:');
-                $message .= "<br>".url('/')."/?id=".$id;
+                $message = __('main.Image successful upload!')."<br>".__('main.Your Link:');
+                $message .= " ".url('/')."/?id=".$id;
+                return redirect('home')->with('status', $message);
             }
-            else $message = __('Too many images!');
+            else return redirect('home')->withErrors(__('main.Too many images!'));
             
-        }
-        return view('home', ['message' => $message, 'galleries' => $galleris]);
+        } 
+        else  return redirect('home')->withErrors(__('main.NotSelectedImages'));
     }
-
+    
+    //функция удаления галереи
     protected function delete($gallery_id)
     {
-        $user = auth()->user();
-        if($user['role'] == 'admin') {
+        if(auth()->user()->role == 'admin') {
             $delete = images::where('id',$gallery_id)->first();
-            if ($delete != null) {
-                $delete->delete();
-                return redirect()->route('home');
-            }
-            return redirect()->route('home');
+            if ($delete != null) $delete->delete();   
+            return redirect('home')->with('status', __('main.Gallery is deleted!'));
         }
-        else echo "Permission Denied";
+        else return redirect('home')->withErrors(__('main.Access Denied'));
         
     }
 
