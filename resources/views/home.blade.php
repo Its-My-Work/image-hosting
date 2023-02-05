@@ -46,7 +46,10 @@
                                     <a href={{route('delete_gallery', ['gallery_id' => $image->id]) }} class="btn btn-danger">{{ __('main.delete') }}</a>
                                 </td>
                             </tr>
-                    @endforeach
+                        @endforeach
+                        <tr>
+                            <td colspan="4" align="center">{{ $galleries->links() }}</td>
+                        </tr>
                     </table>
                 </div>
             </div>

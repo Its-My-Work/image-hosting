@@ -30,7 +30,7 @@
                         <div class="form-row">
                             <div class="col-12 col-md-9 mb-2 mb-md-0">
                                 <div class="input-group">
-                                    <input type="input" maxlength="8" onkeypress="return isNumber(event)" onpaste="return false;" name="gallery_id" class="form-control form-control-lg" placeholder="{{ __('main.id')}}" required>
+                                    <input type="input" maxlength="8"  name="gallery_id" class="form-control form-control-lg" placeholder="{{ __('main.id')}}" required>
                                     <button type="submit" class="btn btn-block btn-lg btn-primary">{{ __('main.show_gallery')}}</button>
                                 </div>
                             </div>

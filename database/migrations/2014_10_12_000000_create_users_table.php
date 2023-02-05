@@ -18,11 +18,19 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('updated_at');
-            $table->string('created_at');
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
             $table->string('role')->default("user");
 
         });
+
+        DB::table('users')->insert
+        ([
+            'role' => 'admin',
+            'name' => 'Admid',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('admin'),
+        ]);
     }
 
     /**

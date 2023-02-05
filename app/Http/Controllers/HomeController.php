@@ -23,8 +23,9 @@ class HomeController extends Controller
 
     public function index($message = false)
     {
-        if(Auth::user()->role == 'admin') $added_by = '*';
-        $galleris = images::show();
+        if(Auth::user()->role == 'admin') $galleris = images::paginate(5);
+        else $galleris = images::where('upload_by',  Auth::user()->id)->paginate(5);
+
         return view('home', ['status' => $message, 'galleries' => $galleris]);
     }
 
@@ -60,8 +61,8 @@ class HomeController extends Controller
     //функция удаления галереи
     protected function delete($gallery_id)
     {
-        if(auth()->user()->role == 'admin') {
-            $delete = images::where('id',$gallery_id)->first();
+        $delete = images::where('id',$gallery_id)->first();
+        if($delete == true and (auth()->user()->role == 'admin' or $delete['upload_by'] == auth()->user()->id)) {
             if ($delete != null) $delete->delete();   
             return redirect('home')->with('status', __('main.Gallery is deleted!'));
         }

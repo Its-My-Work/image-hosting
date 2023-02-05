@@ -16,8 +16,9 @@ class Images extends Migration
         Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->string('file');
-            $table->string('upload_by');
-            $table->string('created_at');
+            $table->integer('upload_by');
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 

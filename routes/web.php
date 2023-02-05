@@ -23,11 +23,13 @@ Route::post('/home', 'App\Http\Controllers\HomeController@create');
 Route::get('/login', 'App\Http\Controllers\LoginController@login')->name('login');
 Route::post('/login', 'App\Http\Controllers\LoginController@authenticate')->name('login');
 
-Route::get('/register', 'App\Http\Controllers\RegisterController@showRegistrationForm')->name('register');
-Route::get('/register/edit/{user_id}','App\Http\Controllers\RegisterController@edit_user')->name('edit_user');
-Route::get('/register/delete/{user_id}','App\Http\Controllers\RegisterController@delete_user')->name('delete_user');
-Route::post('/register/edit/{user_id}','App\Http\Controllers\RegisterController@edit_user');
-Route::post('/register','App\Http\Controllers\RegisterController@create');
+Route::get('/users', 'App\Http\Controllers\RegisterController@showRegistrationForm')->name('register');
+Route::get('/users/edit/{user_id}','App\Http\Controllers\RegisterController@edit_user')->name('edit_user');
+
+Route::post('/users/delete','App\Http\Controllers\RegisterController@delete_user')->name('delete_user');
+
+Route::post('/users/edit/{user_id}','App\Http\Controllers\RegisterController@edit_user');
+Route::post('/users','App\Http\Controllers\RegisterController@create');
 
 Route::post('/logout', 'App\Http\Controllers\LoginController@logout')->name('logout');
 
