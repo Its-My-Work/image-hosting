@@ -1,6 +1,14 @@
 <title>{{ __('main.site_name')}}</title>
 <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 <script src="{{ asset('js/BigPicture.min.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<script src="{{ asset('js/main.js') }}"></script>
+<script>
+window.onload = function(){
+  $('#filter').val($.urlParam("filter"));
+  $('#sort').val($.urlParam("sort"));
+}
+</script>
 @includeif('layouts.top_menu')
 <div class="container">
     <div class="row justify-content-center">
@@ -24,9 +32,30 @@
                 <div class="card-body">
                     <table class="table-data">
                         <thead>
+                        <form name="filter-search" action="/home" id="filter-search" method="GET">
+                                @csrf
+                                <tr>
+                                    <th colspan="2">
+                                        {{ __('main.FilterBy') }}
+                                        <select id="filter" name="filter" onchange="$('#filter-search').submit();">
+                                            <option value="id">{{ __('main.id') }}</option>
+                                            <option value="created_at">{{__('main.created_at')}}</option>
+                                        </select>
+                                    </th>
+                                    <th colspan="2">
+                                        {{ __('main.SortBy') }}
+                                        <select id="sort" name="sort" onchange="$('#filter-search').submit();">
+                                            <option value="ASC">{{ __('main.ASC') }}</option>
+                                            <option value="DESC">{{ __('main.DESC') }}</option>
+                                        </select>
+                                    </th>
+                                    
+                                </tr>
+                            </form>
                         <tr>
                             <th>{{ __('main.id') }}</th>
                             <th>{{ __('main.Images') }}</th>
+                            <th>{{ __('main.created_at') }}</th>
                             <th>{{ __('main.Link') }}</th>
                         </tr>
                         </thead>
@@ -41,6 +70,7 @@
                                     @foreach($files as $file) <img  src="/storage/{{ $file}}" class="img-thumbnail" onclick="BigPicture({el: this, imgSrc: '/storage/{{$file}}'})" width="100px">
                                     @endforeach
                                 </td>
+                                <td>{{ $image->created_at }}</td>
                                 <td>
                                     <a href={{route('index', ['gallery_id' => $image->id]) }} class="btn btn-primary">{{ __('main.open') }}</a><br>
                                     <a href={{route('delete_gallery', ['gallery_id' => $image->id]) }} class="btn btn-danger">{{ __('main.delete') }}</a>

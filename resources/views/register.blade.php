@@ -2,7 +2,15 @@
 <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<script src="{{ asset('js/main.js') }}"></script>
+<script>
+window.onload = function(){
+  $('#filter').val($.urlParam("filter"));
+  $('#sort').val($.urlParam("sort"));
+  if($.urlParam("femail") == true ) $('#femail').val($.urlParam("femail"));
 
+}
+</script>
 
 @includeif('layouts.top_menu')
 <div class="container">
@@ -94,12 +102,39 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-13">
             <div class="card">
                 <div class="card-header">{{ __('main.Users') }}</div>
                     <div class="card-body">
                         <table class="table-data">
                         <thead>
+                            <form name="filter-search" action="/users" id="filter-search" method="GET">
+                                @csrf
+                                <tr>
+                                    <th colspan="2">
+                                        {{ __('main.FilterBy') }}
+                                        <select id="filter" name="filter" onchange="$('#filter-search').submit();">
+                                            <option value="id">{{ __('main.id') }}</option>
+                                            <option value="created_at">{{__('main.created at')}}</option>
+                                            <option value="email">{{ __('main.email') }}</option>
+                                            <option value="name">{{ __('main.name') }}</option>
+                                            <option value="role">{{ __('main.role') }}</option>
+                                        </select>
+                                    </th>
+                                    <th colspan="1">
+                                        {{ __('main.SortBy') }}
+                                        <select id="sort" name="sort" onchange="$('#filter-search').submit();">
+                                            <option value="ASC">{{ __('main.ASC') }}</option>
+                                            <option value="DESC">{{ __('main.DESC') }}</option>
+                                        </select>
+                                    </th>
+                                    <th colspan="3">
+                                        <input type="text" id="femail"  name="femail" size="15"> 
+                                        <input class="btn btn-primary" type="submit" value="{{ __('main.Search') }}">
+                                        <a class="btn btn-danger" href="{{route("register")}}">Х</a>
+                                    </th>
+                                </tr>
+                            </form>
                             <tr>
                                 <th>{{ __('main.id') }}</th>
                                 <th>{{ __('main.name') }}</th>
@@ -109,6 +144,7 @@
                                 <th>{{ __('main.actions') }}</th>
                             </tr>
                         </thead>
+                        @isset($users) 
                         <tr>
                             @foreach($users as $user)
                             <tr>
@@ -117,22 +153,27 @@
                                 <td>{{$user['email']}}</td>
                                 <td>{{$user['role']}}</td>
                                 <td>{{$user['created_at']}}</td>
-                                <td>
-                                    <div class="d-grid col-6">
+                                <td align=center>
+                                    <div class="d-grid">
                                         <a href={{route('edit_user', ['user_id' => $user['id']]) }} class="btn btn-success">Изменить</a>
                                         <form method="post" action="{{route('delete_user')}}">
                                             @csrf
                                             <input name="id"  type="hidden" value="{{$user['id']}}" class="form-control">
-                                            <input class="btn btn-danger" type="submit" value="{{__('main.delete')}}">
+                                            <a class="btn btn-danger"   onclick="$(`#delete-user{{$user['id']}}`).css('display', 'inline-block'); $(`#delete-user-cancel{{$user['id']}}`).css('display', 'inline-block');">{{__('main.delete')}}</a>
+                                            <br>
+                                            <input class="btn btn-danger" style="display:none" id="delete-user{{$user['id']}}" type="submit" value="{{__('main.yes')}}">
+                                            <input type="button" value="{{__('main.no')}}" class="btn btn-secondary" style="display:none" id="delete-user-cancel{{$user['id']}}" onclick="$(`#delete-user-cancel{{$user['id']}}`).css('display', 'none'); $(`#delete-user{{$user['id']}}`).css('display', 'none'); ">
                                         </form>
                                     </div>
                                 </td>
                             </tr>
                             @endforeach
+                        
                         </tr>
                         <tr>
                             <td colspan="6" align="center">{{ $users->links() }}</td>
                         </tr>
+                        @endisset
                     </table>
                 </div>
             </div>

@@ -23,13 +23,27 @@ class RegisterController extends Controller
         $this->middleware('auth');
     }
 
-    public function showRegistrationForm() {
-        $users = User::paginate(10);
+    //функция отображает форму регистрации и пользователей
+    public function showRegistrationForm(Request $get) {
+
+         $get->validate([
+                        'sort' => ['string', 'max:4', 'in:ASC,DESC'],
+                        'filter' => ['string', 'max:15', 'in:id,email,name,created_at'],
+                        'femail' => ['max:15'],
+                        'frole' => ['in:user,admin'],
+                    ]);
+
+        $data['orderby'] = $get['sort'] ?? 'ASC';
+        $data['filterby'] = $get['filter'] ?? 'created_at';
+        $data['femail'] = $get['femail'] ?? '';
+
+        $users = User::OrderBy($data['filterby'],  $data['orderby'])->where('email', 'LIKE', $data['femail'].'%')->paginate(10);
+        
         if(auth()->user()->role == 'admin'){
             if(!$users->isEmpty()) {
                 return view('register', ['users' => $users]);
             }
-            else $message = __('main.No users');
+            else return redirect('users')->with('status', __('main.No users'));
         }
         else return redirect()->route('home');
     }
@@ -62,8 +76,7 @@ class RegisterController extends Controller
                         'role' => ['required', 'in:user,admin'],
                     ]);
                     $hashed = Hash::make($request['password']);
-                user::where('id', $user_id)
-                ->update(['name' => $request['name'], 'email' => $request['email'], 'password' => $hashed, 'role' => $request['role']]);
+                    user::where('id', $user_id)->update(['name' => $request['name'], 'email' => $request['email'], 'password' => $hashed, 'role' => $request['role']]);
                 }
                 else {
                     $request->validate([
@@ -72,14 +85,14 @@ class RegisterController extends Controller
                         'role' => ['required', 'in:user,admin'],
                     ]);
                     $hashed = Hash::make($request['password']);
-                user::where('id', $user_id)
-                ->update(['name' => $request['name'], 'email' => $request['email'], 'role' => $request['role']]);
+                    user::where('id', $user_id)->update(['name' => $request['name'], 'email' => $request['email'], 'role' => $request['role']]);
                 }
                 
                 return redirect('users')->with('status', __('main.UserUpdated'));
             }
             $edit = user::where('id',$user_id)->first();
             if ($edit != null) return view('register', ['user_data' => $edit, 'users' => User::paginate(10)]);
+            else return redirect('home')->withErrors(__('main.UserNotFound'));
         }
         return redirect('home')->withErrors(__('main.Access Denied'));
     }

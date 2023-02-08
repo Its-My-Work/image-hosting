@@ -20,11 +20,16 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
-
-    public function index($message = false)
+    //функция отображает галереи согласно заданному фильтру
+    public function index(request $get, $message = false)
     {
-        if(Auth::user()->role == 'admin') $galleris = images::paginate(5);
-        else $galleris = images::where('upload_by',  Auth::user()->id)->paginate(5);
+        $get->validate([
+                        'sort' => ['string', 'max:4', 'in:ASC,DESC'],
+                        'filter' => ['string', 'max:15', 'in:id,name,created_at'],
+                    ]);
+
+        if(Auth::user()->role == 'admin') $galleris = images::OrderBy($get['filter'] ?? 'id',  $get['sort'] ?? 'ASC')->paginate(5);
+        else $galleris = images::where('upload_by',  Auth::user()->id)->OrderBy($get['filter'] ?? 'id',  $get['sort'] ?? 'ASC')->paginate(5);
 
         return view('home', ['status' => $message, 'galleries' => $galleris]);
     }
@@ -49,7 +54,8 @@ class HomeController extends Controller
                 $id = DB::table('images')->insertGetId(['file' => $filename, 'upload_by' => Auth::user()->id, 'created_at' => new DateTime]);
                 //сообщение об успешной загрузке
                 $message = __('main.Image successful upload!')."<br>".__('main.Your Link:');
-                $message .= " ".url('/')."/?id=".$id;
+                $message .= " <a href='".url('/')."/?id=".$id."'>".url('/')."/?id=".$id."</a>";
+                
                 return redirect('home')->with('status', $message);
             }
             else return redirect('home')->withErrors(__('main.Too many images!'));
