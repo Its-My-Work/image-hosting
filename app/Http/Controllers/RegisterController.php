@@ -43,7 +43,7 @@ class RegisterController extends Controller
             if(!$users->isEmpty()) {
                 return view('register', ['users' => $users]);
             }
-            else return redirect('users')->with('status', __('main.No users'));
+            else return redirect('users')->withErrors( __('main.NoSearchUsers'));
         }
         else return redirect()->route('home');
     }
