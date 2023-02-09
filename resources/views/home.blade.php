@@ -30,7 +30,7 @@ window.onload = function(){
             <div class="card">
                 <div class="card-header">{{ __('main.Galleries') }}</div>
                 <div class="card-body">
-                    <table class="table-data">
+                    <table class="table-data col-12">
                         <thead>
                         <form name="filter-search" action="/home" id="filter-search" method="GET">
                                 @csrf
@@ -67,7 +67,7 @@ window.onload = function(){
                                         array_pop($files);
                                     @endphp
                                 <td>
-                                    @foreach($files as $file) <img  src="/storage/{{ $file}}" class="img-thumbnail" onclick="BigPicture({el: this, imgSrc: '/storage/{{$file}}'})" width="100px">
+                                    @foreach($files as $file) <img  src={{ URL::asset("storage/$file") }} class="img-thumbnail" onclick="BigPicture({el: this, imgSrc: '/storage/{{$file}}'})" width="100px">
                                     @endforeach
                                 </td>
                                 <td>{{ $image->created_at }}</td>

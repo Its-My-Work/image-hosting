@@ -106,7 +106,7 @@ window.onload = function(){
             <div class="card">
                 <div class="card-header">{{ __('main.Users') }}</div>
                     <div class="card-body">
-                        <table class="table-data">
+                        <table class="table-data col-12">
                         <thead>
                             <form name="filter-search" action="/users" id="filter-search" method="GET">
                                 @csrf

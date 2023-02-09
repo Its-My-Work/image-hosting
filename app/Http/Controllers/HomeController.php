@@ -31,6 +31,7 @@ class HomeController extends Controller
         if(Auth::user()->role == 'admin') $galleris = images::OrderBy($get['filter'] ?? 'id',  $get['sort'] ?? 'ASC')->paginate(5);
         else $galleris = images::where('upload_by',  Auth::user()->id)->OrderBy($get['filter'] ?? 'id',  $get['sort'] ?? 'ASC')->paginate(5);
 
+        if(empty($galleris)) $message = __('main.NoGalleries!');
         return view('home', ['status' => $message, 'galleries' => $galleris]);
     }
 
