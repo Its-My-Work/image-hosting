@@ -8,7 +8,7 @@ use App\Models\images;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controller;
-
+use URL;
 
 class IndexController extends Controller
 {
@@ -47,7 +47,7 @@ class IndexController extends Controller
                     $files = explode('!', $image['file']);
                     unset($files[count($files)-1]);
                     foreach($files as $file) {
-                        $message .= "<img onclick=\"BigPicture({el: this, imgSrc: '/storage/". $file."'})\" src='/storage/". $file."' class='gallery img-thumbnail'>";
+                        $message .= "<img onclick=\"BigPicture({el: this, imgSrc: '/storage/". $file."'})\" src=".URL::asset('storage/'.$file)."  class='gallery img-thumbnail'>";
                     }
                 }
                 return view('index', ['message' => $message, 'menu' => $menu]);
